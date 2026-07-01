@@ -1,57 +1,78 @@
-// EmailJS Public Key
-(function () {
-    emailjs.init("YOUR_PUBLIC_KEY");
-})();
 
-let cart = [];
-let total = 0;
+emailjs.init("xyz");
 
-// Add Item
-function addItem(service, price) {
+// Array to store services
+var cart = [];
 
-    let item = {
-        name: service,
-        price: price
-    };
+// Total amount
+var total = 0;
+
+// When page opens
+window.onload = function () {
+
+    // Get saved cart
+    var data = localStorage.getItem("laundryCart");
+
+    if (data != null) {
+
+        cart = JSON.parse(data);
+
+        showCart();
+
+    }
+
+};
+
+// Function to add service
+function addItem(name, price) {
+
+    var item = [];
+
+    item[0] = name;
+    item[1] = price;
 
     cart.push(item);
 
-    displayCart();
+    saveCart();
+
+    showCart();
+
 }
 
-// Display Cart
-function displayCart() {
+// Function to display cart
+function showCart() {
 
-    let table = document.getElementById("cartTable");
+    var table = document.getElementById("cartTable");
 
     table.innerHTML = "";
 
     total = 0;
 
-    for (let i = 0; i < cart.length; i++) {
+    for (var i = 0; i < cart.length; i++) {
 
-        total += cart[i].price;
+        total = total + cart[i][1];
 
-        table.innerHTML += `
+        table.innerHTML +=
 
-        <tr>
+        "<tr>" +
 
-            <td>${i + 1}</td>
+        "<td>" + (i + 1) + "</td>" +
 
-            <td>${cart[i].name}</td>
+        "<td>" + cart[i][0] + "</td>" +
 
-            <td>₹${cart[i].price}</td>
+        "<td>₹" + cart[i][1] + "</td>" +
 
-            <td>
-                <button class="remove-btn"
-                onclick="removeItem(${i})">
-                Remove
-                </button>
-            </td>
+        "<td>" +
 
-        </tr>
+        "<button class='remove-btn' onclick='removeItem(" + i + ")'>" +
 
-        `;
+        "Remove" +
+
+        "</button>" +
+
+        "</td>" +
+
+        "</tr>";
 
     }
 
@@ -59,28 +80,98 @@ function displayCart() {
 
 }
 
-// Remove Item
+// Function to remove item
 function removeItem(index) {
 
     cart.splice(index, 1);
 
-    displayCart();
+    saveCart();
+
+    showCart();
 
 }
 
+// Save cart in browser
+function saveCart() {
+
+    localStorage.setItem("laundryCart", JSON.stringify(cart));
+
+}
+
+// Empty cart
+function clearCart() {
+
+    cart = [];
+
+    saveCart();
+
+    showCart();
+
+}
+// ----------------------------
 // Booking Form
+// ----------------------------
 
-document.getElementById("bookingForm").addEventListener("submit", function (e) {
+document.getElementById("bookingForm").onsubmit = function(event){
 
-    e.preventDefault();
+    event.preventDefault();
 
-    let name = document.getElementById("name").value;
+    // Get values
+    var name = document.getElementById("name").value;
+    var email = document.getElementById("email").value;
+    var phone = document.getElementById("phone").value;
 
-    let email = document.getElementById("email").value;
+    // Check name
+    if(name == ""){
 
-    let phone = document.getElementById("phone").value;
+        alert("Please enter your name.");
 
-    if (cart.length == 0) {
+        return;
+
+    }
+
+    // Check email
+    if(email == ""){
+
+        alert("Please enter your email.");
+
+        return;
+
+    }
+
+    // Email validation
+    var emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+
+    if(emailPattern.test(email) == false){
+
+        alert("Please enter a valid email.");
+
+        return;
+
+    }
+
+    // Check phone
+    if(phone == ""){
+
+        alert("Please enter your phone number.");
+
+        return;
+
+    }
+
+    // Phone validation
+    var phonePattern = /^[0-9]{10}$/;
+
+    if(phonePattern.test(phone) == false){
+
+        alert("Phone number should contain exactly 10 digits.");
+
+        return;
+
+    }
+
+    // Check cart
+    if(cart.length == 0){
 
         alert("Please add at least one service.");
 
@@ -88,15 +179,23 @@ document.getElementById("bookingForm").addEventListener("submit", function (e) {
 
     }
 
-    let serviceList = "";
+    // Create service list
+    var serviceList = "";
 
-    for (let i = 0; i < cart.length; i++) {
+    for(var i = 0; i < cart.length; i++){
 
-        serviceList += cart[i].name + ", ";
+        serviceList = serviceList + cart[i][0];
+
+        if(i != cart.length - 1){
+
+            serviceList = serviceList + ", ";
+
+        }
 
     }
 
-    let templateParams = {
+    // EmailJS Data
+    var details = {
 
         customer_name: name,
 
@@ -110,35 +209,33 @@ document.getElementById("bookingForm").addEventListener("submit", function (e) {
 
     };
 
+    // Send Email
+
     emailjs.send(
 
-        "YOUR_SERVICE_ID",
+        "ID",
 
-        "YOUR_TEMPLATE_ID",
+        "Template_ID",
 
-        templateParams
+        details
 
-    )
-
-    .then(function () {
+    ).then(function(){
 
         document.getElementById("message").innerHTML =
         "Booking Successful!";
 
-        cart = [];
+        alert("Booking Successful!");
 
-        total = 0;
-
-        displayCart();
-
+        // Clear form
         document.getElementById("bookingForm").reset();
 
-    })
+        // Empty cart
+        clearCart();
 
-    .catch(function () {
+    }).catch(function(){
 
-        alert("Something went wrong.");
+        alert("Email could not be sent.");
 
     });
 
-});
+}
