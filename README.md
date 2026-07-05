@@ -48,11 +48,6 @@ Laundry-Service-Website/
 │── script.js
 │── README.md
 
-└── images/
-    │── hero.png
-    │── logo.png
-    │── washing-machine.png
-
 ## How to Run
 
 1. Download the project.
