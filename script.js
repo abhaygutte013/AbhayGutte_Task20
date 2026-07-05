@@ -1,241 +1,207 @@
-
-emailjs.init("xyz");
-
-// Array to store services
-var cart = [];
-
-// Total amount
-var total = 0;
-
-// When page opens
-window.onload = function () {
-
-    // Get saved cart
-    var data = localStorage.getItem("laundryCart");
-
-    if (data != null) {
-
-        cart = JSON.parse(data);
-
-        showCart();
-
-    }
-
-};
-
-// Function to add service
-function addItem(name, price) {
-
-    var item = [];
-
-    item[0] = name;
-    item[1] = price;
-
-    cart.push(item);
-
-    saveCart();
-
-    showCart();
-
-}
-
-// Function to display cart
-function showCart() {
-
-    var table = document.getElementById("cartTable");
-
-    table.innerHTML = "";
-
-    total = 0;
-
-    for (var i = 0; i < cart.length; i++) {
-
-        total = total + cart[i][1];
-
-        table.innerHTML +=
-
-        "<tr>" +
-
-        "<td>" + (i + 1) + "</td>" +
-
-        "<td>" + cart[i][0] + "</td>" +
-
-        "<td>₹" + cart[i][1] + "</td>" +
-
-        "<td>" +
-
-        "<button class='remove-btn' onclick='removeItem(" + i + ")'>" +
-
-        "Remove" +
-
-        "</button>" +
-
-        "</td>" +
-
-        "</tr>";
-
-    }
-
-    document.getElementById("total").innerHTML = total;
-
-}
-
-// Function to remove item
-function removeItem(index) {
-
-    cart.splice(index, 1);
-
-    saveCart();
-
-    showCart();
-
-}
-
-// Save cart in browser
-function saveCart() {
-
-    localStorage.setItem("laundryCart", JSON.stringify(cart));
-
-}
-
-// Empty cart
-function clearCart() {
-
-    cart = [];
-
-    saveCart();
-
-    showCart();
-
-}
-// ----------------------------
-// Booking Form
-// ----------------------------
-
-document.getElementById("bookingForm").onsubmit = function(event){
-
-    event.preventDefault();
-
-    // Get values
-    var name = document.getElementById("name").value;
-    var email = document.getElementById("email").value;
-    var phone = document.getElementById("phone").value;
-
-    // Check name
-    if(name == ""){
-
-        alert("Please enter your name.");
-
-        return;
-
-    }
-
-    // Check email
-    if(email == ""){
-
-        alert("Please enter your email.");
-
-        return;
-
-    }
-
-    // Email validation
-    var emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
-
-    if(emailPattern.test(email) == false){
-
-        alert("Please enter a valid email.");
-
-        return;
-
-    }
-
-    // Check phone
-    if(phone == ""){
-
-        alert("Please enter your phone number.");
-
-        return;
-
-    }
-
-    // Phone validation
-    var phonePattern = /^[0-9]{10}$/;
-
-    if(phonePattern.test(phone) == false){
-
-        alert("Phone number should contain exactly 10 digits.");
-
-        return;
-
-    }
-
-    // Check cart
-    if(cart.length == 0){
-
-        alert("Please add at least one service.");
-
-        return;
-
-    }
-
-    // Create service list
-    var serviceList = "";
-
-    for(var i = 0; i < cart.length; i++){
-
-        serviceList = serviceList + cart[i][0];
-
-        if(i != cart.length - 1){
-
-            serviceList = serviceList + ", ";
-
-        }
-
-    }
-
-    // EmailJS Data
-    var details = {
-
-        customer_name: name,
-
-        customer_email: email,
-
-        customer_phone: phone,
-
-        services: serviceList,
-
-        total_amount: total
-
-    };
-
-    // Send Email
-
-    emailjs.send(
-
-        "ID",
-
-        "Template_ID",
-
-        details
-
-    ).then(function(){
-
-        document.getElementById("message").innerHTML =
-        "Booking Successful!";
-
-        alert("Booking Successful!");
-
-        // Clear form
-        document.getElementById("bookingForm").reset();
-
-        // Empty cart
-        clearCart();
-
-    }).catch(function(){
-
-        alert("Email could not be sent.");
-
-    });
-
-}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Laundry Service</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo">
+            <h2>Laundry</h2>
+        </div>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#quality">Quality</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button class="login-btn">Username</button>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-text">
+            <h1>
+                Revitalize Your Clothes with Expert
+                <span>Laundry Services!</span>
+            </h1>
+            <p>
+                From premium dry cleaning to wash & fold, we provide high-quality laundry services at affordable prices.
+            </p>
+            <a href="#services">
+                <button class="hero-btn">Book a Service Today</button>
+            </a>
+        </div>
+        <div class="hero-image">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTB9D1O89bkdxUqFZn2c9qqqLLWq7XRkFTW5nYsUuuVw&s=10"
+                alt="Laundry Operations">
+        </div>
+    </section>
+
+    <section class="achievement">
+        <div class="box">
+            <h2>15+</h2>
+            <p>Laundry Services</p>
+        </div>
+        <div class="box">
+            <h2>240+</h2>
+            <p>Happy Customers</p>
+        </div>
+        <div class="box">
+            <h2>2+</h2>
+            <p>Years Experience</p>
+        </div>
+        <div class="box">
+            <h2>100%</h2>
+            <p>Customer Satisfaction</p>
+        </div>
+    </section>
+
+    <section class="booking" id="services">
+
+        <div class="service-list">
+            <h2>Our Services</h2>
+            <p>Select your required laundry services.</p>
+
+            <div class="service">
+                <span>Dry Cleaning</span>
+                <span>₹200</span>
+                <button onclick="pushNewItemToCart('Dry Cleaning', 200)">Add Item</button>
+            </div>
+
+            <div class="service">
+                <span>Wash & Fold</span>
+                <span>₹100</span>
+                <button onclick="pushNewItemToCart('Wash & Fold', 100)">Add Item</button>
+            </div>
+
+            <div class="service">
+                <span>Ironing</span>
+                <span>₹80</span>
+                <button onclick="pushNewItemToCart('Ironing', 80)">Add Item</button>
+            </div>
+
+            <div class="service">
+                <span>Stain Removal</span>
+                <span>₹300</span>
+                <button onclick="pushNewItemToCart('Stain Removal', 300)">Add Item</button>
+            </div>
+
+            <div class="service">
+                <span>Leather Cleaning</span>
+                <span>₹500</span>
+                <button onclick="pushNewItemToCart('Leather Cleaning', 500)">Add Item</button>
+            </div>
+
+            <div class="service">
+                <span>Wedding Dress Cleaning</span>
+                <span>₹1000</span>
+                <button onclick="pushNewItemToCart('Wedding Dress Cleaning', 1000)">Add Item</button>
+            </div>
+        </div>
+
+        <div class="right-section">
+
+            <div class="cart">
+                <h2>Added Items</h2>
+                <div class="table-scroll-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Service</th>
+                                <th>Price</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartTable">
+                        </tbody>
+                    </table>
+                </div>
+                <h3>Total : ₹ <span id="total">0</span></h3>
+            </div>
+
+            <div class="booking-form">
+                <h2>Book Now</h2>
+                <form id="bookingForm">
+                    <input type="text" id="name" placeholder="Enter Full Name" required>
+                    <input type="email" id="email" placeholder="Enter Email" required>
+                    <input type="text" id="phone" placeholder="Enter Mobile Number" required>
+                    <button type="submit">Book Now</button>
+                </form>
+                <p id="message"></p>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="quality" id="quality">
+        <div class="quality-box">
+            <i class="fa-solid fa-shirt"></i>
+            <h3>Premium Quality</h3>
+            <p>We use quality detergents and machines to clean your clothes safely.</p>
+        </div>
+        <div class="quality-box">
+            <i class="fa-solid fa-truck"></i>
+            <h3>Free Pickup</h3>
+            <p>Free pickup and delivery service within the city.</p>
+        </div>
+        <div class="quality-box">
+            <i class="fa-solid fa-clock"></i>
+            <h3>Fast Delivery</h3>
+            <p>Same-day delivery is available for selected services.</p>
+        </div>
+        <div class="quality-box">
+            <i class="fa-solid fa-thumbs-up"></i>
+            <h3>Trusted Service</h3>
+            <p>Thousands of satisfied customers trust our service.</p>
+        </div>
+    </section>
+
+    <section class="newsletter">
+        <h2>Subscribe to Our Newsletter</h2>
+        <div class="subscribe">
+            <input type="email" id="newsletterInputEmail" placeholder="Enter your Email">
+            <button id="newsletterSubmitBtn">Subscribe</button>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div>
+            <h2>Laundry</h2>
+            <p>We provide quality laundry services at affordable prices.</p>
+        </div>
+        <div>
+            <h3>Quick Links</h3>
+            <p>Home</p>
+            <p>Services</p>
+            <p>About</p>
+            <p>Contact</p>
+        </div>
+        <div>
+            <h3>Contact</h3>
+            <p>Email : laundry@gmail.com</p>
+            <p>Phone : +91 9876543210</p>
+        </div>
+        <div>
+            <h3>Follow Us</h3>
+            <i class="fab fa-facebook"></i>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-twitter"></i>
+            <i class="fab fa-youtube"></i>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
