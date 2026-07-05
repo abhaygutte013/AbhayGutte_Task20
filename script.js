@@ -1,207 +1,181 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Laundry Service</title>
+const emailJSConfig = {
+    publicKey: "YOUR_EMAILJS_PUBLIC_KEY",
+    serviceId: "YOUR_EMAILJS_SERVICE_ID",
+    templateId: "YOUR_EMAILJS_TEMPLATE_ID"
+};
 
-    <link rel="stylesheet" href="style.css">
+emailjs.init(emailJSConfig.publicKey);
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">
+let customUserCartItemsList = [];
+let evaluatedInvoiceSumAmount = 0;
 
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-</head>
+window.onload = function () {
+    const historicalLocalStorageData = localStorage.getItem("savedLaundryCartItems");
+    
+    if (historicalLocalStorageData !== null) {
+        customUserCartItemsList = JSON.parse(historicalLocalStorageData);
+        rebuildCartInterfaceTable();
+    }
+};
 
-<body>
+function pushNewItemToCart(chosenServiceName, designatedUnitCost) {
+    const serviceRecordBlock = [chosenServiceName, designatedUnitCost];
+    
+    customUserCartItemsList.push(serviceRecordBlock);
+    commitCartStateToDiskCache();
+    rebuildCartInterfaceTable();
+}
 
-    <nav>
-        <div class="logo">
-            <h2>Laundry</h2>
-        </div>
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#quality">Quality</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-        <button class="login-btn">Username</button>
-    </nav>
+function rebuildCartInterfaceTable() {
+    const tableTargetBodyElement = document.getElementById("cartTable");
+    const numericalPriceSummaryNode = document.getElementById("total");
+    
+    tableTargetBodyElement.innerHTML = "";
+    evaluatedInvoiceSumAmount = 0;
 
-    <section class="hero">
-        <div class="hero-text">
-            <h1>
-                Revitalize Your Clothes with Expert
-                <span>Laundry Services!</span>
-            </h1>
-            <p>
-                From premium dry cleaning to wash & fold, we provide high-quality laundry services at affordable prices.
-            </p>
-            <a href="#services">
-                <button class="hero-btn">Book a Service Today</button>
-            </a>
-        </div>
-        <div class="hero-image">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTB9D1O89bkdxUqFZn2c9qqqLLWq7XRkFTW5nYsUuuVw&s=10"
-                alt="Laundry Operations">
-        </div>
-    </section>
+    for (let currentOffset = 0; currentOffset < customUserCartItemsList.length; currentOffset++) {
+        const structuralItemName = customUserCartItemsList[currentOffset][0];
+        const financialItemPrice = customUserCartItemsList[currentOffset][1];
 
-    <section class="achievement">
-        <div class="box">
-            <h2>15+</h2>
-            <p>Laundry Services</p>
-        </div>
-        <div class="box">
-            <h2>240+</h2>
-            <p>Happy Customers</p>
-        </div>
-        <div class="box">
-            <h2>2+</h2>
-            <p>Years Experience</p>
-        </div>
-        <div class="box">
-            <h2>100%</h2>
-            <p>Customer Satisfaction</p>
-        </div>
-    </section>
+        evaluatedInvoiceSumAmount = evaluatedInvoiceSumAmount + financialItemPrice;
 
-    <section class="booking" id="services">
+        tableTargetBodyElement.innerHTML += 
+            "<tr>" +
+                "<td>" + (currentOffset + 1) + "</td>" +
+                "<td>" + structuralItemName + "</td>" +
+                "<td>₹" + financialItemPrice + "</td>" +
+                "<td>" +
+                    "<button class='remove-btn' onclick='evictItemFromCartOffsetIndex(" + currentOffset + ")'>" +
+                        "Remove" +
+                    "</button>" +
+                "</td>" +
+            "</tr>";
+    }
 
-        <div class="service-list">
-            <h2>Our Services</h2>
-            <p>Select your required laundry services.</p>
+    numericalPriceSummaryNode.innerHTML = evaluatedInvoiceSumAmount;
+}
 
-            <div class="service">
-                <span>Dry Cleaning</span>
-                <span>₹200</span>
-                <button onclick="pushNewItemToCart('Dry Cleaning', 200)">Add Item</button>
-            </div>
+function evictItemFromCartOffsetIndex(targetArrayPlacingOffset) {
+    customUserCartItemsList.splice(targetArrayPlacingOffset, 1);
+    commitCartStateToDiskCache();
+    rebuildCartInterfaceTable();
+}
 
-            <div class="service">
-                <span>Wash & Fold</span>
-                <span>₹100</span>
-                <button onclick="pushNewItemToCart('Wash & Fold', 100)">Add Item</button>
-            </div>
+function commitCartStateToDiskCache() {
+    localStorage.setItem("savedLaundryCartItems", JSON.stringify(customUserCartItemsList));
+}
 
-            <div class="service">
-                <span>Ironing</span>
-                <span>₹80</span>
-                <button onclick="pushNewItemToCart('Ironing', 80)">Add Item</button>
-            </div>
+function clearCompleteCartStateSystem() {
+    customUserCartItemsList = [];
+    commitCartStateToDiskCache();
+    rebuildCartInterfaceTable();
+}
 
-            <div class="service">
-                <span>Stain Removal</span>
-                <span>₹300</span>
-                <button onclick="pushNewItemToCart('Stain Removal', 300)">Add Item</button>
-            </div>
+document.getElementById("bookingForm").onsubmit = function (formDomSubmitEvent) {
+    formDomSubmitEvent.preventDefault();
 
-            <div class="service">
-                <span>Leather Cleaning</span>
-                <span>₹500</span>
-                <button onclick="pushNewItemToCart('Leather Cleaning', 500)">Add Item</button>
-            </div>
+    const individualClientFullName = document.getElementById("name").value.trim();
+    const individualClientEmailAddress = document.getElementById("email").value.trim();
+    const individualClientMobilePhone = document.getElementById("phone").value.trim();
+    const dynamicInterfaceStatusOutputText = document.getElementById("message");
 
-            <div class="service">
-                <span>Wedding Dress Cleaning</span>
-                <span>₹1000</span>
-                <button onclick="pushNewItemToCart('Wedding Dress Cleaning', 1000)">Add Item</button>
-            </div>
-        </div>
+    dynamicInterfaceStatusOutputText.innerHTML = "";
 
-        <div class="right-section">
+    // Field Guard Validation 1: Universal String Empty Checks
+    if (individualClientFullName === "" || individualClientEmailAddress === "" || individualClientMobilePhone === "") {
+        alert("Execution Error: Form process blocked. Please fill out all input text indexes.");
+        return;
+    }
 
-            <div class="cart">
-                <h2>Added Items</h2>
-                <div class="table-scroll-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>Service</th>
-                                <th>Price</th>
-                                <th>Remove</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cartTable">
-                        </tbody>
-                    </table>
-                </div>
-                <h3>Total : ₹ <span id="total">0</span></h3>
-            </div>
+    // Field Guard Validation 2: Explicit Structural Email Layout Formatting Checks
+    const standardEmailAddressRegexPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (standardEmailAddressRegexPattern.test(individualClientEmailAddress) === false) {
+        alert("Execution Error: Input data format invalid. Please entry a genuine email reference layout.");
+        return;
+    }
 
-            <div class="booking-form">
-                <h2>Book Now</h2>
-                <form id="bookingForm">
-                    <input type="text" id="name" placeholder="Enter Full Name" required>
-                    <input type="email" id="email" placeholder="Enter Email" required>
-                    <input type="text" id="phone" placeholder="Enter Mobile Number" required>
-                    <button type="submit">Book Now</button>
-                </form>
-                <p id="message"></p>
-            </div>
+    // Field Guard Validation 3: Telephone Digit Pattern Bounds Checking (Exactly 10 Numerical Keys)
+    const exactTenDigitMobilePhoneRegexPattern = /^[0-9]{10}$/;
+    if (exactTenDigitMobilePhoneRegexPattern.test(individualClientMobilePhone) === false) {
+        alert("Execution Error: Numerical bounds constraint violated. Mobile indices require exactly 10 characters.");
+        return;
+    }
 
-        </div>
-    </section>
+    // Field Guard Validation 4: Active Cart Items Scope Verification Check
+    if (customUserCartItemsList.length === 0) {
+        alert("Execution Error: Order pipeline transmission aborted. Please stack at least 1 menu service package item.");
+        return;
+    }
 
-    <section class="quality" id="quality">
-        <div class="quality-box">
-            <i class="fa-solid fa-shirt"></i>
-            <h3>Premium Quality</h3>
-            <p>We use quality detergents and machines to clean your clothes safely.</p>
-        </div>
-        <div class="quality-box">
-            <i class="fa-solid fa-truck"></i>
-            <h3>Free Pickup</h3>
-            <p>Free pickup and delivery service within the city.</p>
-        </div>
-        <div class="quality-box">
-            <i class="fa-solid fa-clock"></i>
-            <h3>Fast Delivery</h3>
-            <p>Same-day delivery is available for selected services.</p>
-        </div>
-        <div class="quality-box">
-            <i class="fa-solid fa-thumbs-up"></i>
-            <h3>Trusted Service</h3>
-            <p>Thousands of satisfied customers trust our service.</p>
-        </div>
-    </section>
+    // Reconstruct item array indices directly to build a highly visible plain text string collection array listing.
+    let flattenedDisplayServicesString = "";
+    for (let currentTrackOffset = 0; currentTrackOffset < customUserCartItemsList.length; currentTrackOffset++) {
+        flattenedDisplayServicesString += customUserCartItemsList[currentTrackOffset][0];
+        
+        // Append visual spacing commas uniformly except for termination flags index points.
+        if (currentTrackOffset !== customUserCartItemsList.length - 1) {
+            flattenedDisplayServicesString += ", ";
+        }
+    }
 
-    <section class="newsletter">
-        <h2>Subscribe to Our Newsletter</h2>
-        <div class="subscribe">
-            <input type="email" id="newsletterInputEmail" placeholder="Enter your Email">
-            <button id="newsletterSubmitBtn">Subscribe</button>
-        </div>
-    </section>
+    // Build the dynamic variable payload parameters array mapped explicitly matching EmailJS service setups.
+    const operationalEmailTemplateBundlePayload = {
+        customer_name: individualClientFullName,
+        customer_email: individualClientEmailAddress,
+        customer_phone: individualClientMobilePhone,
+        services: flattenedDisplayServicesString,
+        total_amount: evaluatedInvoiceSumAmount
+    };
 
-    <footer id="contact">
-        <div>
-            <h2>Laundry</h2>
-            <p>We provide quality laundry services at affordable prices.</p>
-        </div>
-        <div>
-            <h3>Quick Links</h3>
-            <p>Home</p>
-            <p>Services</p>
-            <p>About</p>
-            <p>Contact</p>
-        </div>
-        <div>
-            <h3>Contact</h3>
-            <p>Email : laundry@gmail.com</p>
-            <p>Phone : +91 9876543210</p>
-        </div>
-        <div>
-            <h3>Follow Us</h3>
-            <i class="fab fa-facebook"></i>
-            <i class="fab fa-instagram"></i>
-            <i class="fab fa-twitter"></i>
-            <i class="fab fa-youtube"></i>
-        </div>
-    </footer>
+    // Update ongoing validation user state messages gracefully to balance expectations.
+    dynamicInterfaceStatusOutputText.style.color = "orange";
+    dynamicInterfaceStatusOutputText.innerHTML = "Syncing with transmission servers, please remain on page...";
 
-    <script src="script.js"></script>
-</body>
+    // Fire data arrays across network connections to EmailJS framework platforms.
+    emailjs.send(
+        emailJSConfig.serviceId,
+        emailJSConfig.templateId,
+        operationalEmailTemplateBundlePayload
+    )
+    .then(function () {
+        // UI Response Success Configuration Routines
+        dynamicInterfaceStatusOutputText.style.color = "green";
+        dynamicInterfaceStatusOutputText.innerHTML = "Booking Successful! A structural confirmation email is en route.";
+        alert("Transaction Finalized: Your service invoice has been tracked and submitted successfully!");
 
-</html>
+        // Completely reset form state attributes back to initial system properties.
+        document.getElementById("bookingForm").reset();
+        clearCompleteCartStateSystem();
+    })
+    .catch(function (networkTransmissionExceptionLog) {
+        dynamicInterfaceStatusOutputText.style.color = "red";
+        dynamicInterfaceStatusOutputText.innerHTML = "Transmission Interception Exception: Endpoint verification handshake failed.";
+        alert("Processing Fault Notice: Authorization credentials rejected network communication layers.");
+        console.error("System Log Output Trace context:", networkTransmissionExceptionLog);
+    });
+};
+
+
+document.getElementById("newsletterSubmitBtn").onclick = function () {
+    const inputFieldDomElement = document.getElementById("newsletterInputEmail");
+    const parsedTargetEmailValue = inputFieldDomElement.value.trim();
+    
+    // Strict Structural Email Validation Regex Pattern
+    const preciseEmailStructuralValidationRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+    // Field Verification Logic Guards
+    if (parsedTargetEmailValue === "") {
+        alert("Input Attention: Please supply an active subscriber index tracking email link context first.");
+        return;
+    }
+
+    if (preciseEmailStructuralValidationRegex.test(parsedTargetEmailValue) === false) {
+        alert("Input Attention: System cannot process subscription request. Formatting parsing structure is broken.");
+        return;
+    }
+
+    // UI Response Alerts Execution Pass
+    alert("Subscription Process Completed! Verification tracking loops registered for context pointer: " + parsedTargetEmailValue);
+    inputFieldDomElement.value = "";
+};
