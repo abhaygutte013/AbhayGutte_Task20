@@ -1,74 +1,65 @@
-# Fresh Laundry Service Website
+# Laundry Service Website
 
-## About Project
+## Project Overview
 
-This is a simple Laundry Service Website created using HTML, CSS and JavaScript. The website allows users to view laundry services, check prices, add services to a cart, book a laundry service and subscribe to the newsletter.
+This is a simple laundry service website created using HTML, CSS, and JavaScript.  
+The website allows users to view laundry services, add items to cart, and book a service online.
 
-The project is made as a college mini project to practice front-end web development.
-
-## Technologies Used
-
-* HTML
-* CSS
-* JavaScript
-* EmailJS
+This project was built to practice frontend development and understand how JavaScript works with HTML and CSS.
 
 ## Features
 
-* Home Page
-* About Section
-* Services Section
-* Pricing Section
-* Booking Form
-* Shopping Cart
-* Newsletter Subscription
-* Contact Section
-* Responsive Design
+- Responsive navigation bar
+- User name saved using localStorage
+- Add and remove services from cart
+- Automatic total calculation
+- Booking form with validation
+- EmailJS integration for sending booking details
+- Newsletter subscription system
+- Smooth scrolling navigation
+- Fully responsive design for mobile and desktop
 
-## Functions
+## Technologies Used
 
-* Add services to cart
-* Remove services from cart
-* Clear complete cart
-* Store cart using LocalStorage
-* Display username in navbar
-* Booking form validation
-* Newsletter subscription
-* Booking confirmation email using EmailJS
-* Newsletter confirmation email
-* Smooth scrolling
+- HTML
+- CSS
+- JavaScript
+- EmailJS (for sending emails)
 
-## How to Run
+## How It Works
 
-1. Download the project.
-2. Open the project folder in Visual Studio Code.
-3. Replace the EmailJS placeholder values in **script.js** with your own Public Key, Service ID and Template IDs.
-4. Open **index.html** in your browser.
+1. User opens the website
+2. User enters their name (saved in browser)
+3. User selects laundry services
+4. Items are added to cart automatically
+5. Total price is calculated
+6. User fills booking form
+7. Booking details are sent using EmailJS
+8. User can also subscribe to newsletter
 
-## Folder Structure
+## Important Notes
 
-FreshLaundry/
+- EmailJS requires Service ID, Template ID, and Public Key
+- These values must be added in script.js for email functionality to work
+- Cart data is stored in localStorage
 
-* index.html
-* style.css
-* script.js
-* images
-* README.md
- 
 ## What I Learned
 
-* Creating web pages using HTML.
-* Designing responsive layouts using CSS.
-* JavaScript DOM manipulation.
-* Form validation.
-* Using LocalStorage.
-* Using EmailJS for sending emails.
-* Working with events and functions.
+- How to build a responsive website using CSS
+- How JavaScript works with DOM manipulation
+- How to use localStorage
+- How to validate forms
+- How EmailJS sends emails without backend
+- How to create a simple booking system
 
 ## Future Improvements
 
-* Online payment
-* User login
-* Order tracking
-* Admin panel
-* Database connectivity
+- Add login system
+- Add payment gateway
+- Improve UI design
+- Add order tracking system
+
+
+## Author
+
+Created as a beginner project for learning frontend development.
