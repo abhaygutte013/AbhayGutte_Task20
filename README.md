@@ -1,65 +1,67 @@
 # Laundry Service Website
 
-## Project Overview
+## Name
 
-This is a simple laundry service website created using HTML, CSS, and JavaScript.  
-The website allows users to view laundry services, add items to cart, and book a service online.
+Laundry Service Website
 
-This project was built to practice frontend development and understand how JavaScript works with HTML and CSS.
+## About Project
+
+This project is made using HTML, CSS and JavaScript.
+
+It is a simple laundry service website where users can view available laundry services, add services to a cart and book a laundry service. Users can also subscribe to the newsletter.
 
 ## Features
 
-- Responsive navigation bar
-- User name saved using localStorage
-- Add and remove services from cart
-- Automatic total calculation
-- Booking form with validation
-- EmailJS integration for sending booking details
-- Newsletter subscription system
-- Smooth scrolling navigation
-- Fully responsive design for mobile and desktop
+- Home page
+- Laundry services list
+- Add service to cart
+- Remove service from cart
+- Total price calculation
+- Booking form
+- Newsletter subscription
+- Responsive design for mobile
 
 ## Technologies Used
 
 - HTML
 - CSS
 - JavaScript
-- EmailJS (for sending emails)
+- EmailJS
 
-## How It Works
+## Files
 
-1. User opens the website
-2. User enters their name (saved in browser)
-3. User selects laundry services
-4. Items are added to cart automatically
-5. Total price is calculated
-6. User fills booking form
-7. Booking details are sent using EmailJS
-8. User can also subscribe to newsletter
+- index.html
+- style.css
+- script.js
+- config.js
+- README.md
 
-## Important Notes
+## How to Run
 
-- EmailJS requires Service ID, Template ID, and Public Key
-- These values must be added in script.js for email functionality to work
-- Cart data is stored in localStorage
+1. Download the project.
+2. Open the project folder.
+3. Add your EmailJS details in `config.js`.
+4. Open `index.html` in your browser.
+
+## Challenges
+
+- Making the cart update correctly.
+- Calculating the total price.
+- Connecting EmailJS.
+- Showing error messages below the input fields.
 
 ## What I Learned
 
-- How to build a responsive website using CSS
-- How JavaScript works with DOM manipulation
-- How to use localStorage
-- How to validate forms
-- How EmailJS sends emails without backend
-- How to create a simple booking system
+- Creating a webpage using HTML.
+- Styling using CSS.
+- Using JavaScript functions.
+- Using arrays.
+- Form validation.
+- Using EmailJS for sending emails.
 
 ## Future Improvements
 
-- Add login system
-- Add payment gateway
-- Improve UI design
-- Add order tracking system
-
-
-## Author
-
-Created as a beginner project for learning frontend development.
+- Add login system.
+- Add online payment.
+- Store booking details in database.
+- Add more laundry services.
