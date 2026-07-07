@@ -1,10 +1,15 @@
+
+emailjs.init(EMAIL_PUBLIC_KEY);
+
+let cart = [];
+
+// Get username
 let username = localStorage.getItem("username");
 
-if (username == null || username == "") {
-
+if (username == null) {
     username = prompt("Enter your name");
 
-    if (username == null || username == "") {
+    if (username == "") {
         username = "Guest";
     }
 
@@ -13,307 +18,193 @@ if (username == null || username == "") {
 
 document.getElementById("userBtn").innerHTML = username;
 
-emailjs.init("B_8FKSP9Vcn9gS-bt");
 
-let serviceID = "service_mrgn9bs";
-let bookingTemplate = "template_agoz8sp";
-let newsletterTemplate = "template_fafj74a";
-
-let cart = [];
-let total = 0;
-
-window.onload = function () {
-
-    let data = localStorage.getItem("cart");
-
-    if (data != null) {
-
-        cart = JSON.parse(data);
-
-        updateCart();
-    }
-
-};
-
+// Add item into cart
 function addItem(name, price) {
 
-    let item = {
-        name: name,
-        price: price
-    };
+    let item = {};
+
+    item.name = name;
+    item.price = price;
 
     cart.push(item);
 
-    saveCart();
-
-    updateCart();
-
+    showCart();
 }
 
-function updateCart() {
+
+// Show cart items
+function showCart() {
 
     let table = document.getElementById("cartTable");
 
-    let totalText = document.getElementById("total");
-
     table.innerHTML = "";
 
-    total = 0;
+    let total = 0;
 
     for (let i = 0; i < cart.length; i++) {
 
         total = total + cart[i].price;
 
         table.innerHTML +=
-            "<tr>" +
-            "<td>" + (i + 1) + "</td>" +
-            "<td>" + cart[i].name + "</td>" +
-            "<td>₹" + cart[i].price + "</td>" +
-            "<td><button class='remove-btn' onclick='removeItem(" + i + ")'>Remove</button></td>" +
-            "</tr>";
-
+        "<tr>" +
+        "<td>" + (i + 1) + "</td>" +
+        "<td>" + cart[i].name + "</td>" +
+        "<td>₹" + cart[i].price + "</td>" +
+        "<td><button onclick='removeItem(" + i + ")'>Remove</button></td>" +
+        "</tr>";
     }
 
-    totalText.innerHTML = total;
-
+    document.getElementById("total").innerHTML = total;
 }
 
+
+// Remove item
 function removeItem(index) {
 
     cart.splice(index, 1);
 
-    saveCart();
-
-    updateCart();
+    showCart();
 
 }
+// Booking form
 
-function saveCart() {
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-
-}
-
-function clearCart() {
-
-    cart = [];
-
-    saveCart();
-
-    updateCart();
-
-}
 let bookingForm = document.getElementById("bookingForm");
 
 bookingForm.addEventListener("submit", function (event) {
 
     event.preventDefault();
 
-    let name = document.getElementById("name").value.trim();
+    let name = document.getElementById("name").value;
+    let email = document.getElementById("email").value;
+    let phone = document.getElementById("phone").value;
 
-    let email = document.getElementById("email").value.trim();
+    document.getElementById("nameError").innerHTML = "";
+    document.getElementById("emailError").innerHTML = "";
+    document.getElementById("phoneError").innerHTML = "";
+    document.getElementById("message").innerHTML = "";
 
-    let phone = document.getElementById("phone").value.trim();
-
-    let message = document.getElementById("message");
+    let ok = true;
 
     if (name == "") {
-
-        alert("Please enter your name.");
-        return;
-
+        document.getElementById("nameError").innerHTML = "Enter your name";
+        ok = false;
     }
 
     if (email == "") {
-
-        alert("Please enter your email.");
-        return;
-
-    }
-
-    let emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
-
-    if (emailPattern.test(email) == false) {
-
-        alert("Please enter a valid email.");
-        return;
-
+        document.getElementById("emailError").innerHTML = "Enter your email";
+        ok = false;
     }
 
     if (phone == "") {
-
-        alert("Please enter your phone number.");
-        return;
-
+        document.getElementById("phoneError").innerHTML = "Enter mobile number";
+        ok = false;
     }
 
-    let phonePattern = /^[0-9]{10}$/;
-
-    if (phonePattern.test(phone) == false) {
-
-        alert("Enter a valid 10 digit phone number.");
-        return;
-
+    if (phone.length != 10) {
+        document.getElementById("phoneError").innerHTML = "Enter 10 digit number";
+        ok = false;
     }
 
     if (cart.length == 0) {
+        document.getElementById("message").innerHTML = "Add at least one service";
+        document.getElementById("message").style.color = "red";
+        ok = false;
+    }
 
-        alert("Please add at least one laundry service.");
+    if (ok == false) {
         return;
-
     }
 
     let services = "";
 
     for (let i = 0; i < cart.length; i++) {
 
-        services += cart[i].name;
+        services = services + cart[i].name;
 
         if (i != cart.length - 1) {
-
-            services += ", ";
-
+            services = services + ", ";
         }
 
     }
 
-    let details = {
+    let data = {
 
         customer_name: name,
         customer_email: email,
         customer_phone: phone,
         services: services,
-        total_amount: total
+        total_price: document.getElementById("total").innerHTML
 
     };
 
-    message.style.color = "orange";
-    message.innerHTML = "Sending Booking...";
+    emailjs.send(SERVICE_ID, BOOKING_TEMPLATE, data)
+        .then(function () {
 
-    emailjs.send(
+            document.getElementById("message").innerHTML = "Booking Successful";
+            document.getElementById("message").style.color = "green";
 
-        serviceID,
-        bookingTemplate,
-        details
+            bookingForm.reset();
 
-    )
+            cart = [];
 
-    .then(function () {
+            showCart();
 
-        message.style.color = "green";
-
-        message.innerHTML =
-        "Booking Successful! We will contact you soon.";
-
-        alert("Booking Successful!");
-
-        bookingForm.reset();
-
-        clearCart();
-
-    })
-
-    .catch(function () {
-
-        message.style.color = "red";
-
-        message.innerHTML =
-        "Unable to send booking email.";
-
-        alert("Something went wrong.");
-
-    });
+        });
 
 });
+// Newsletter
+
 let subscribeBtn = document.getElementById("subscribeBtn");
 
 subscribeBtn.addEventListener("click", function () {
 
-    let email = document.getElementById("newsletterEmail").value.trim();
+    let name = document.getElementById("newsletterName").value;
+    let email = document.getElementById("newsletterEmail").value;
 
-    let msg = document.getElementById("subscribeMessage");
+    document.getElementById("newsNameError").innerHTML = "";
+    document.getElementById("newsEmailError").innerHTML = "";
+    document.getElementById("subscribeMessage").innerHTML = "";
+
+    let ok = true;
+
+    if (name == "") {
+
+        document.getElementById("newsNameError").innerHTML = "Enter your name";
+
+        ok = false;
+    }
 
     if (email == "") {
 
-        msg.innerHTML = "Please enter your email.";
-        msg.style.color = "red";
-        return;
+        document.getElementById("newsEmailError").innerHTML = "Enter your email";
 
+        ok = false;
     }
 
-    let emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
-
-    if (emailPattern.test(email) == false) {
-
-        msg.innerHTML = "Please enter a valid email.";
-        msg.style.color = "red";
+    if (ok == false) {
         return;
-
     }
 
-    let details = {
+    let data = {
 
-        email: email
+        user_name: name,
+        user_email: email
 
     };
 
-    msg.style.color = "orange";
-    msg.innerHTML = "Subscribing...";
-
-    emailjs.send(
-
-        serviceID,
-        newsletterTemplate,
-        details
-
-    )
+    emailjs.send(SERVICE_ID, NEWSLETTER_TEMPLATE, data)
 
     .then(function () {
 
-        msg.style.color = "green";
+        document.getElementById("subscribeMessage").innerHTML = "Subscribed Successfully";
 
-        msg.innerHTML = "Subscription Successful!";
+        document.getElementById("subscribeMessage").style.color = "green";
+
+        document.getElementById("newsletterName").value = "";
 
         document.getElementById("newsletterEmail").value = "";
-
-    })
-
-    .catch(function () {
-
-        msg.style.color = "red";
-
-        msg.innerHTML = "Unable to subscribe.";
 
     });
 
 });
-
-let links = document.querySelectorAll("nav a");
-
-for (let i = 0; i < links.length; i++) {
-
-    links[i].addEventListener("click", function (event) {
-
-        let target = this.getAttribute("href");
-
-        if (target.startsWith("#")) {
-
-            event.preventDefault();
-
-            let section = document.querySelector(target);
-
-            if (section != null) {
-
-                section.scrollIntoView({
-
-                    behavior: "smooth"
-
-                });
-
-            }
-
-        }
-
-    });
-
-}
